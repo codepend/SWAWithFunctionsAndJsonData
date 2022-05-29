@@ -1,0 +1,48 @@
+﻿@page "/"
+@inject IPeopleService _peopleService
+<PageTitle>Index</PageTitle>
+
+<h1>Json Peoples!</h1>
+
+<div class="row">
+    <div class="col col-6">
+        <EditForm OnSubmit="AddPerson" Model="newPerson">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <label>First Name</label>
+            <InputText @bind-Value="@(newPerson.FirstName)" />
+            <label>Last Name</label>
+            <InputText @bind-Value="@(newPerson.LastName)" />
+            <button type="submit">Submit</button>
+        </EditForm>
+    </div>
+    <div class="col col-6">
+        <h3>Existing People</h3>
+        @foreach (var person in people)
+        {
+            <h5>@person.FirstName @person.LastName</h5>
+        }
+    </div>
+</div>
+
+@code{
+    
+    List<Person> people = new List<Person>();
+    Person newPerson = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPeople();
+    }
+
+
+    private async Task LoadPeople()
+    {
+        people = await _peopleService.GetPeople();
+    }
+
+    private async Task AddPerson()
+    {
+        people.Add( await _peopleService.AddPerson(newPerson));
+        newPerson = new();
+    }
+}
